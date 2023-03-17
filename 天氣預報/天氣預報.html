@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天氣預報</title>
+    <style>
+        *{
+            margin: 0px;
+            box-sizing: border-box;
+            font-family:'Times New Roman', Times, serif;
+            
+        }
+        header{
+            width: 100%;
+            height: 100px;
+            text-align: center;
+            line-height: 100px;
+            font-size: 50px;
+        }
+        nav{
+            width: 100%;
+            height: 100px;
+          
+            padding: 0px 200px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        nav button{
+            width: 180px;
+            height: 50px;
+            font-size: 30px;
+            
+        }
+        nav input{
+            height: 30px;
+        }
+        main{
+            width: 100%;
+            padding: 0px 150px;
+            background-color: gray;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content:flex-start;
+            align-items: center;
+            align-content: center;
+
+            /* background-image: url("/grass.jpg");
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat; */
+           
+        }
+        main .card{
+            width: calc(1503px / 4);
+            
+            margin: 15px 10px;
+            padding: 0px 10px;
+            background-color: white;
+            
+            border-radius: 30px;
+            box-shadow: 12px 12px 7px rgba(0, 0, 0, 0.5);
+            
+        }
+        h1{
+            text-align: center;  
+            
+            margin: 8px 0px;
+        }
+        h2,h3{
+            font-size: 18px;
+        }
+        h4,h5,h6{
+            font-size: 18px;
+            margin: 5px 0px;
+        }
+        main .card .part_1,.part_3{
+            border-top:1px solid ;
+            position: relative;
+            
+        }
+        main .card .part_2{
+            position: relative; 
+           
+            border-top:1px solid #000
+        }
+        main .card .part_3{
+            border-top:1px solid #000;
+            border-radius: 0px 0px 20px 20px;
+        }
+        p{
+            font-size: 18px;
+            font-weight: bold;
+            margin: 5px 0px;
+        }
+        main .card svg.sunning{
+            background-image: url("img/sunning.svg");
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            position: absolute;
+            top: 30%;
+            right: 10%;
+        }   
+        main .card svg.cloudy{
+            background-image: url("./img/cloudy.svg");
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            position: absolute;
+            top: 30%;
+            right: 10%;
+        }    
+        main .card svg.rainy{
+            background-image: url("./img/rainy.svg");
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            position: absolute;
+            top: 30%;
+            right: 10%;
+        }    
+        nav .search-bar{
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+        } 
+        nav .search-bar button{
+            width: 70px;
+            height: 30px;
+            font-size: 20px;
+            line-height: 30px;
+            margin-left: 10px;
+        }   
+       
+    </style>
+</head>
+<body>
+    <header>全臺天氣狀況</header>
+    <nav>
+        <button onclick="area('全部')" data-btn="全臺" >全臺地區</button>
+        <button onclick="area('北部')" data-btn="北部" >北部</button>
+        <button onclick="area('中部')" data-btn="中部" >中部</button>
+        <button onclick="area('南部')" data-btn="南部" >南部</button>
+        <button onclick="area('東部')" data-btn="東部" >東部</button>
+        <button onclick="area('外島')" data-btn="外島" >外島</button>
+        <div class="search-bar">
+            <input type: text name="" id="city_input">
+            <button onclick = "search_city()">搜尋</button>
+        </div>
+        
+    </nav>
+    <main>
+        
+       
+    </main>
+
+
+    <script>
+        // 因為需要將22個卡片丟進去main，所以在這邊先選擇
+        const main = document.querySelector('main')
+        var allArea
+        
+        var north = [1,3,4,5,7,13,18] //北部
+        var center = [8,9,11,14,20]   //中部
+        var south = [0,2,6,15,17]     //南部
+        var east = [10,12]            //東部
+        var island = [16,19,21]       //外島
+        
+        var allCard = [north, south, east, island, center]
+        // 獲取api，需有授權碼
+        const url = 'https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization=CWB-A56332CB-5DF5-4066-80E3-A16B27CF1BAF'
+        // 利用fetch與api對接
+        fetch(url).then(function(response){
+            // json為獲取資料中的重要部分，取決於設定api的設定
+            return response.json();
+        })
+        // 接著在function裡面寫一個值代表json回傳的資料
+        .then(function(weather_info){
+            console.log(weather_info)
+            // 在這邊建立一個locations變數去裝所有的location
+            // const locations = myJson.records.location;
+            // 因為資料隨時都會更新，所以用locations的長度去當作迴圈的上限
+            // length為此陣列中有幾個陣列元素
+            // for(let index = 0;index < locations.length;index++){
+            //     console.log(locations[index].locationName);
+            // }
+
+            allArea = weather_info
+            
+            // weather_info.records.location.length代表weather_info.records.location[]的總長度，可隨時因台灣地區有更動可及時更新修改。
+            // 利用for打印出所有22個縣市，
+            for(let index = 0;index < weather_info.records.location.length;index++ ){
+                const weather = weather_info.records.location[index];
+
+                // 下方console.log是先確認所有需要用到的資料是否正確
+                console.log(weather.locationName);//縣市名稱
+                console.log(weather.weatherElement[0].time[0].startTime);//時段開始
+                console.log(weather.weatherElement[0].time[0].endTime);//時段結束
+                console.log(weather.weatherElement[0].time[0].parameter.parameterName);//天氣狀況
+                console.log(weather.weatherElement[2].time[0].parameter.parameterName);//最高溫
+                console.log(weather.weatherElement[4].time[0].parameter.parameterName);//最低溫
+                console.log(weather.weatherElement[3].time[0].parameter.parameterName);//體感
+                console.log(weather.weatherElement[1].time[0].parameter.parameterName);//降雨
+
+
+                // 將圖片宣告為一個物件，讓他們可以選到
+                let weather_img = ['','','']
+                // 根據降雨機率去選擇相對應的圖片(sunning、cloudy or rainy)
+                //  weather.weatherElement[1].time[]，[]只有0,1,2
+                // element=weather.weatherElement[1].time[]
+                // index能讓[]裡面的元素都跑過一次
+                weather.weatherElement[1].time.forEach((element,plus) => {
+                    if(element.parameter.parameterName <= 40){
+                        weather_img[plus] = 
+                        `<svg class="sunning" width="60" height="60">
+                            <animateTransform
+                            attributeName="transform"
+                            type="rotate"
+                            from="0,0,0" to="360,0,0"
+                            dur="10s" repeatCount="indefinite" />
+                        </svg>`
+                    }else if(element.parameter.parameterName <= 60){
+                        weather_img[plus] = `<svg class="cloudy" width="60" height="60"></svg>`
+                    }else{
+                        weather_img[plus] = `<svg class="rainy" width="60" height="60"></svg>`
+                    }
+                    
+                });
+                
+                
+                main.innerHTML += `
+                
+                <div class="card" >
+                    
+                    <h1>${weather.locationName}</h1>
+                    <div class="part_1" >
+                        <h2>起始時間:<br>${weather.weatherElement[0].time[0].startTime}~</h2>
+                        <h3>${weather.weatherElement[0].time[0].endTime}</h3>
+                        
+                        <h4>天氣狀況:${weather.weatherElement[0].time[0].parameter.parameterName}</h4>
+                        <h5>當日最低溫:${weather.weatherElement[2].time[0].parameter.parameterName}度</h5>
+                        <h6>當日最低溫:${weather.weatherElement[4].time[0].parameter.parameterName}度</h6>
+                        <p>體感狀態:${weather.weatherElement[3].time[0].parameter.parameterName}<p>
+                        <p>降雨機率:${weather.weatherElement[1].time[0].parameter.parameterName}%</p>
+                        ${weather_img[0]}
+                        
+                    </div>
+                    <div class="part_2" >
+                        <h2>起始時間:<br>${weather.weatherElement[0].time[1].startTime}~</h2>
+                        <h3>${weather.weatherElement[0].time[1].endTime}</h3>
+                        <h4>天氣狀況:${weather.weatherElement[0].time[1].parameter.parameterName}</h4>
+                        <h5>當日最低溫:${weather.weatherElement[2].time[1].parameter.parameterName}度</h5>
+                        <h6>當日最低溫:${weather.weatherElement[4].time[1].parameter.parameterName}度</h6>
+                        <p>體感狀態:${weather.weatherElement[3].time[1].parameter.parameterName}<p>
+                        <p>降雨機率:${weather.weatherElement[1].time[1].parameter.parameterName}%</p>
+                        ${weather_img[1]}
+                    </div>
+                    <div class="part_3" >
+                        <h2>起始時間:<br>${weather.weatherElement[0].time[2].startTime}~</h2>
+                        <h3>${weather.weatherElement[0].time[2].endTime}</h3>
+                        <h4>天氣狀況:${weather.weatherElement[0].time[2].parameter.parameterName}</h4>
+                        <h5>當日最低溫:${weather.weatherElement[2].time[2].parameter.parameterName}度</h5>
+                        <h6>當日最低溫:${weather.weatherElement[4].time[2].parameter.parameterName}度</h6>
+                        <p>體感狀態:${weather.weatherElement[3].time[2].parameter.parameterName}<p>
+                        <p>降雨機率:${weather.weatherElement[1].time[2].parameter.parameterName}%</p>
+                        ${weather_img[2]}
+                    </div>
+                </div>`
+               
+            }
+        })
+         
+        // 選擇至獨立城市
+        // 1.將所有卡片都隱藏，只顯示藥的城市
+        // 2.清空卡片區域，再重新抓資料印卡片
+
+        // 區域(北部、中部...)
+        //清空卡片區域，再重新抓資料印卡片
+        // var north = [1,3,4,5,7,13,18] //北部
+        // var center = [8,9,11,14,20]   //中部
+        // var south = [0,2,6,15,17]     //南部
+        // var east = [10,12]            //東部
+        // var island = [16,19,21]       //外島
+
+            function area(place){
+                // 先清空
+                main .innerHTML= ''
+                // 先根據使用者點擊區域(place)，target為要輸出的城市編號
+                var target
+                if(place == '北部'){
+                    target = [1,3,4,5,7,13,18]
+                }else if(place == '中部'){
+                    target = [8,9,11,14,20]
+                }else if(place == '南部'){
+                    target = [0,2,6,15,17] 
+                }else if(place == '東部'){
+                    target = [10,12] 
+                }else if(place == '外島'){
+                    target = [16,19,21]
+                }else{
+                    target = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]
+                }
+                console.log(allArea);
+
+                // 開始打印~~~~
+                target.forEach(city =>{
+                    let weather_img = ['','','']
+                    // 需要先在上面var 一個全域allArea的變數，且 allArea = weather_info(api來的資料)，不然資料會卡在上面
+                    const weather = allArea.records.location[city];
+                    // 對被選到的城市放氣象圖片
+                    allArea.records.location[city].weatherElement[1].time.forEach((element,plus) => {
+                    if(element.parameter.parameterName <= 40){
+                        weather_img[plus] = 
+                    `<svg class="sunning" width="60" height="60">  
+                    <animateTransform
+                    attributeName="transform"
+                    type="rotate"
+                    from="0,0,0" to="360,0,0"
+                    dur="10s" repeatCount="indefinite" />
+                    </svg>`
+                    }else if(element.parameter.parameterName <= 60){
+                        weather_img[plus] = `<svg class="cloudy" width="60" height="60"></svg>`
+                    }else{
+                        weather_img[plus] = `<svg class="rainy" width="60" height="60"></svg>`
+                    }
+                    });
+                    // += 累積卡片數量，不然只會輸出一張卡片
+                    main.innerHTML += `
+                    <div class="card" >
+                        <h1>${weather.locationName}</h1>
+                        <div class="part_1">
+                            <h2>起始時間:<br>${weather.weatherElement[0].time[0].startTime}~</h2>
+                            <h3>${weather.weatherElement[0].time[0].endTime}</h3>
+                            <h4>天氣狀況:${weather.weatherElement[0].time[0].parameter.parameterName}</h4>
+                            <h5>當日最低溫:${weather.weatherElement[2].time[0].parameter.parameterName}度</h5>
+                            <h6>當日最低溫:${weather.weatherElement[4].time[0].parameter.parameterName}度</h6>
+                            <p>體感狀態:${weather.weatherElement[3].time[0].parameter.parameterName}<p>
+                            <p>降雨機率:${weather.weatherElement[1].time[0].parameter.parameterName}%</p>
+                            ${weather_img[0]}
+                            
+                        </div>
+                        <div class="part_2">
+                            <h2>起始時間:<br>${weather.weatherElement[0].time[1].startTime}~</h2>
+                            <h3>${weather.weatherElement[0].time[1].endTime}</h3>
+                            <h4>天氣狀況:${weather.weatherElement[0].time[1].parameter.parameterName}</h4>
+                            <h5>當日最低溫:${weather.weatherElement[2].time[1].parameter.parameterName}度</h5>
+                            <h6>當日最低溫:${weather.weatherElement[4].time[1].parameter.parameterName}度</h6>
+                            <p>體感狀態:${weather.weatherElement[3].time[1].parameter.parameterName}<p>
+                            <p>降雨機率:${weather.weatherElement[1].time[1].parameter.parameterName}%</p>
+                            ${weather_img[1]}
+                        </div>
+                        <div class="part_3">
+                            <h2>起始時間:<br>${weather.weatherElement[0].time[2].startTime}~</h2>
+                            <h3>${weather.weatherElement[0].time[2].endTime}</h3>
+                            <h4>天氣狀況:${weather.weatherElement[0].time[2].parameter.parameterName}</h4>
+                            <h5>當日最低溫:${weather.weatherElement[2].time[2].parameter.parameterName}度</h5>
+                            <h6>當日最低溫:${weather.weatherElement[4].time[2].parameter.parameterName}度</h6>
+                            <p>體感狀態:${weather.weatherElement[3].time[2].parameter.parameterName}<p>
+                            <p>降雨機率:${weather.weatherElement[1].time[2].parameter.parameterName}%</p>
+                            ${weather_img[2]}
+                        </div>
+                    </div>`
+                }); 
+            }   
+            
+            
+            // 被點擊到的block，沒有的none
+            // function area(place){
+            //     // 先清空
+            //     main .innerHTML= ''
+            //     // 先根據使用者點擊區域(place)，target為要輸出的城市編號
+            //     var target
+            //     if(place == '北部'){
+            //         target = [1,3,4,5,7,13,18]
+            //     }else if(place == '中部'){
+            //         target = [8,9,11,14,20]
+            //     }else if(place == '南部'){
+            //         target = [0,2,6,15,17] 
+            //     }else if(place == '東部'){
+            //         target = [10,12] 
+            //     }else if(place == '外島'){
+            //         target = [16,19,21]
+            //     }else{
+            //         target = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]
+            //     }     
+            // }
+            // allArea.records.location.forEach(card => {
+            //     console.log(allArea.records.location.card.dataset.id)
+                //    if(target.includes(parseInt(card.dataset.id))) {
+                //     card.style.display = "block"
+                //    }else{
+                //     card.style.display = "none"
+                //    }
+            // });
+            
+            // 製作搜尋功能
+
+    
+        // function search_city() {
+        //     var keyword = document.querySelector('#city_input').value
+        //     console.log(card.dataset.cityname)
+            // console.log(card.dataset.cityname)
+            // if (card.dataset.cityname == keyword ){
+            //     card.style.display = "block"
+            // }else{
+            //     card.style.display = "none"
+            // }
+        // }        
+
+
+        // 製作一個可以同步與氣象局更新天氣的網頁 且包含所有縣市
+        // 各縣市需包含的資料有  縣市名稱、時段(開始/結束)、天氣狀況、最高/最低溫、體感狀態、降雨機率
+        // 降雨機率
+        // <=40%，晴天。 41~60= 陰天。 >60 雨天
+    </script>
+</body>
+</html>
